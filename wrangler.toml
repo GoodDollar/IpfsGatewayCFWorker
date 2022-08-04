@@ -1,0 +1,16 @@
+name = "ipfsgateway"
+# type = "webpack"
+type = "javascript"
+usage_model = "bundled"
+account_id = "2a94650a01a5a443da8d4210ab9beac6"
+compatibility_flags = []
+workers_dev = true
+compatibility_date = "2022-08-04"
+node_compat = true
+main = "src/worker.js" # becomes "./src/worker.js"
+
+[[rules]]
+type = "ESModule"
+globs = ["**/*.js"]
+
+# requires secret WEB3STORAGE_TOKEN
