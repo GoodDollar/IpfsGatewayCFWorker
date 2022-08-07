@@ -16,8 +16,8 @@ async function handleRequest(request, storage) {
 }
 
 const getCorsHeaders = request => {
-  const origin = request.headers.get('origin') || ''
-  const isAllowed = origin.match(/gooddollar\.org$|good.*\.netlify\.app$|\/\/localhost/)
+  const origin = request.headers.get('Origin') || ''
+  const isAllowed = origin.match(/gooddollar\.org$|good.*\.netlify\.app$|goodceramic\-*\.herokuapp\.com$|\/\/localhost/)
   const corsHeaders = {
     'Access-Control-Allow-Origin': isAllowed ? origin : '',
     'Access-Control-Allow-Methods': 'GET, HEAD, POST, OPTIONS',
@@ -36,12 +36,18 @@ async function handleOptions(request) {
 
 export default {
   async fetch(request, env, context) {
-    const storage = new Web3Storage({
-      token: env.WEB3STORAGE_TOKEN
-    })
-    if (request.method === 'OPTIONS') {
-      return handleOptions(request)
+    switch (request.method) {
+      case 'OPTIONS':
+        return handleOptions(request)
+      case 'POST': {
+        const storage = new Web3Storage({
+          token: env.WEB3STORAGE_TOKEN
+        })
+
+        return handleRequest(request, storage)
+      }
+      default:
+        return new Response(JSON.stringify({ error: 'method not allowed' }), { status: 400 })
     }
-    return handleRequest(request, storage)
   }
 }
