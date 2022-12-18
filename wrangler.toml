@@ -8,7 +8,7 @@ workers_dev = true
 compatibility_date = "2022-08-04"
 node_compat = true
 main = "src/worker.js" # becomes "./src/worker.js"
-vars = {USE_WEB3STORAGE = true}
+vars = {USE_WEB3STORAGE = true, WEB3STORAGE_TOKEN="", NFTSTORAGE_TOKEN=""}
 [[rules]]
 type = "ESModule"
 globs = ["**/*.js"]
