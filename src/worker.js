@@ -1,7 +1,11 @@
 import { Web3Storage } from 'web3.storage'
 import { CID } from 'multiformats/cid'
+import { NFTStorage } from 'nft.storage'
 
-async function handleRequest(request, storage) {
+async function handleRequest(request) {
+  const storage = new Web3Storage({
+    token: env.WEB3STORAGE_TOKEN
+  })
   const corsHeaders = getCorsHeaders(request)
   const isAllowed = corsHeaders['Access-Control-Allow-Origin'] !== ''
   if (!isAllowed) {
@@ -12,6 +16,23 @@ async function handleRequest(request, storage) {
   // Get the File from the form. Key for the file is 'image' for me
   const file = formData.get('file')
   const cid = await storage.put([file], { wrapWithDirectory: false, maxRetries: 3 }).catch(e => console.log(e))
+  return new Response(JSON.stringify({ cid }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
+}
+
+async function handleRequestNft(request) {
+  const nftstorage = new NFTStorage({
+    token: env.NFTSTORAGE_TOKEN
+  })
+  const corsHeaders = getCorsHeaders(request)
+  const isAllowed = corsHeaders['Access-Control-Allow-Origin'] !== ''
+  if (!isAllowed) {
+    return new Response(JSON.stringify({ error: 'origin not allowed' }), { status: 400 })
+  }
+  // Parse the request to FormData
+  const formData = await request.formData()
+  // Get the File from the form. Key for the file is 'image' for me
+  const file = formData.get('file')
+  const cid = await nftstorage.storeBlob(file, { wrapWithDirectory: false, maxRetries: 3 }).catch(e => console.log(e))
   return new Response(JSON.stringify({ cid }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
 }
 
@@ -40,11 +61,8 @@ export default {
       case 'OPTIONS':
         return handleOptions(request)
       case 'POST': {
-        const storage = new Web3Storage({
-          token: env.WEB3STORAGE_TOKEN
-        })
-
-        return handleRequest(request, storage)
+        if (env.USE_WEB3STORAGE) return handleRequest(request)
+        return handleRequestNft(request)
       }
       default:
         return new Response(JSON.stringify({ error: 'method not allowed' }), { status: 400 })
