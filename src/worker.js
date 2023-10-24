@@ -36,7 +36,7 @@ async function handleRequestNft(request) {
 
 const getCorsHeaders = request => {
   const origin = request.headers.get('Origin') || ''
-  const isAllowed = origin.match(/gooddollar\.org$|good.*\.netlify\.app$|goodceramic\-*\.herokuapp\.com$|\/\/localhost/)
+  const isAllowed = origin.match(/gooddollar\.org$|good.*\.netlify\.app$|goodceramic\-.*\.herokuapp\.com$|\/\/localhost/)
 
   const corsHeaders = {
     'Access-Control-Allow-Origin': isAllowed ? origin : '',
