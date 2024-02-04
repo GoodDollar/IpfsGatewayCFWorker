@@ -2,7 +2,11 @@ import { Web3Storage } from "web3.storage";
 import { CID } from "multiformats/cid";
 import { NFTStorage } from "nft.storage";
 import upng from "upng-js";
+import { URL } from "whatwg-url";
+import { getClient } from "./w3up";
+import { Buffer } from "buffer";
 
+globalThis.URL = URL; //fix url parsing dids for w3up
 let env;
 
 const optimizeImage = async (file) => {
@@ -11,6 +15,11 @@ const optimizeImage = async (file) => {
     const frames = upng.toRGBA8(decoded);
     const optimized = Buffer.from(
       upng.encode(frames, decoded.width, decoded.height, 256)
+    );
+    console.log(
+      `image optimized: ${file.size} to ${optimized.length} %:${(
+        optimized.length / file.size
+      ).toFixed(2)}`
     );
     return new Blob([optimized]);
   } catch (e) {
@@ -32,10 +41,32 @@ async function handleRequest(request) {
   const file = formData.get("file");
   const optimized = await optimizeImage(file);
   const cid = await storage
-    .put([file], { wrapWithDirectory: false, maxRetries: 3 })
+    .put([optimized], { wrapWithDirectory: false, maxRetries: 3 })
     .catch((e) => console.log(e));
 
   return new Response(JSON.stringify({ cid }), {
+    headers: { ...corsHeaders, "Content-Type": "application/json" },
+  });
+}
+
+async function handleRequestW3up(request, env) {
+  const client = await getClient({
+    pk: env.WEB3STORAGE_PK,
+    proof: env.WEB3STORAGE_PROOF,
+  });
+
+  const { corsHeaders } = getCorsHeaders(request);
+
+  // Parse the request to FormData
+  const formData = await request.formData();
+  // Get the File from the form. Key for the file is 'image' for me
+  const file = formData.get("file");
+  const optimized = await optimizeImage(file);
+  const cid = await client
+    .uploadFile(optimized, { retries: 3 })
+    .catch((e) => console.log(e));
+
+  return new Response(JSON.stringify({ cid: cid.toString() }), {
     headers: { ...corsHeaders, "Content-Type": "application/json" },
   });
 }
@@ -86,6 +117,7 @@ async function handleOptions(request) {
 export default {
   async fetch(request, myenv, context) {
     env = myenv; //store env in globals so its available in methods
+
     switch (request.method) {
       case "OPTIONS":
         return handleOptions(request);
@@ -98,8 +130,9 @@ export default {
         }
         let response;
         try {
-          if (env.USE_WEB3STORAGE) response = await handleRequest(request);
-          else response = await handleRequestNft(request);
+          if (env.USE_WEB3STORAGE) {
+            response = await handleRequestW3up(request, env);
+          } else response = await handleRequestNft(request);
           return response;
         } catch (e) {
           console.error("ipfsgateway request failed", e.message, e);

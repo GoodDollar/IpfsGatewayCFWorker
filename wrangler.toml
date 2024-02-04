@@ -1,17 +1,19 @@
 name = "ipfsgateway"
-# type = "webpack"
-type = "javascript"
 usage_model = "bundled"
 account_id = "2a94650a01a5a443da8d4210ab9beac6"
-compatibility_flags = []
-workers_dev = true
+compatibility_flags = [
+    "nodejs_compat",
+    "transformstream_enable_standard_constructor",
+    "streams_enable_constructors",
+]
 compatibility_date = "2022-08-04"
-node_compat = true
-main = "src/worker.js"                          # becomes "./src/worker.js"
+main = "dist/worker.js"
+
 vars = { USE_WEB3STORAGE = true }
-[[rules]]
-type = "ESModule"
-globs = ["**/*.js"]
+
+[build]
+command = "npm run build"
 
 
 # requires secret WEB3STORAGE_TOKEN and NFTSTORAGE_TOKEN if USE_WEB3STORAGE is false
+# requires WEB3STORAGE_PK and WEB3STORAGE_PROOF for new w3up client
