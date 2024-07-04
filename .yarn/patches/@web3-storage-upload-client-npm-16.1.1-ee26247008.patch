@@ -1,0 +1,12 @@
+diff --git a/dist/src/blob.js b/dist/src/blob.js
+index 58c4f0e08a2ecdf2b69cfe31c1c4124786453fff..015c31b1aa0233a94c6a7f373317ddd381f1692e 100644
+--- a/dist/src/blob.js
++++ b/dist/src/blob.js
+@@ -195,7 +195,6 @@ export async function add({ issuer, with: resource, proofs, audience }, data, op
+             try {
+                 const res = await fetchWithUploadProgress(address.url, {
+                     method: 'PUT',
+-                    mode: 'cors',
+                     body: bytes,
+                     headers: address.headers,
+                     signal: options.signal,

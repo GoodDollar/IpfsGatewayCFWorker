@@ -1,4 +1,3 @@
-import { Web3Storage } from "web3.storage";
 import { CID } from "multiformats/cid";
 import { NFTStorage } from "nft.storage";
 import upng from "upng-js";
@@ -28,26 +27,22 @@ const optimizeImage = async (file) => {
   }
 };
 
-async function handleRequest(request) {
-  const storage = new Web3Storage({
-    token: env.WEB3STORAGE_TOKEN,
-  });
 
-  const { corsHeaders } = getCorsHeaders(request);
 
-  // Parse the request to FormData
-  const formData = await request.formData();
-  // Get the File from the form. Key for the file is 'image' for me
-  const file = formData.get("file");
-  const optimized = await optimizeImage(file);
-  const cid = await storage
-    .put([optimized], { wrapWithDirectory: false, maxRetries: 3 })
-    .catch((e) => console.log(e));
 
-  return new Response(JSON.stringify({ cid }), {
-    headers: { ...corsHeaders, "Content-Type": "application/json" },
-  });
-}
+//   // Parse the request to FormData
+//   const formData = await request.formData();
+//   // Get the File from the form. Key for the file is 'image' for me
+//   const file = formData.get("file");
+//   const optimized = await optimizeImage(file);
+//   const cid = await storage
+//     .put([optimized], { wrapWithDirectory: false, maxRetries: 3 })
+//     .catch((e) => console.log(e));
+
+//   return new Response(JSON.stringify({ cid }), {
+//     headers: { ...corsHeaders, "Content-Type": "application/json" },
+//   });
+// }
 
 async function handleRequestW3up(request, env) {
   const client = await getClient({
@@ -62,8 +57,9 @@ async function handleRequestW3up(request, env) {
   // Get the File from the form. Key for the file is 'image' for me
   const file = formData.get("file");
   const optimized = await optimizeImage(file);
-  const cid = await client
-    .uploadFile(optimized, { retries: 3 })
+
+q  const cid = await client
+    .uploadFile(optimized, { retries: 0 })
     .catch((e) => console.log(e));
 
   return new Response(JSON.stringify({ cid: cid.toString() }), {

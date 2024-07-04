@@ -11,14 +11,17 @@
     "build": "node build.js"
   },
   "dependencies": {
-    "@web3-storage/w3up-client": "^12.4.1",
+    "@web3-storage/w3up-client": "^15.0.0",
     "esbuild": "^0.20.0",
     "esbuild-plugin-w3up-client-wasm-import": "^1.0.0",
     "multiformats": "^9.7.1",
     "nft.storage": "^7.0.0",
     "upng-js": "^2.1.0",
-    "web3.storage": "^4.4.0",
     "whatwg-url": "^14.0.0",
     "wrangler": "^3.23.0"
+  },
+  "packageManager": "yarn@4.3.1",
+  "resolutions": {
+    "@web3-storage/upload-client@npm:^16.1.1": "patch:@web3-storage/upload-client@npm%3A16.1.1#~/.yarn/patches/@web3-storage-upload-client-npm-16.1.1-ee26247008.patch"
   }
 }
