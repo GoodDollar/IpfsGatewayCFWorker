@@ -27,9 +27,6 @@ const optimizeImage = async (file) => {
   }
 };
 
-
-
-
 //   // Parse the request to FormData
 //   const formData = await request.formData();
 //   // Get the File from the form. Key for the file is 'image' for me
@@ -58,7 +55,7 @@ async function handleRequestW3up(request, env) {
   const file = formData.get("file");
   const optimized = await optimizeImage(file);
 
-q  const cid = await client
+  const cid = await client
     .uploadFile(optimized, { retries: 0 })
     .catch((e) => console.log(e));
 
